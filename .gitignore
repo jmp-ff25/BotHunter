@@ -1,0 +1,47 @@
+# Secrets and local environment
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.pyright/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# Test and browser artifacts
+test-results/
+playwright-report/
+blob-report/
+traces/
+trace.zip
+sessions/
+session.json
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+docs/work-reports/*.md
+!docs/work-reports/README.md
+!docs/work-reports/TEMPLATE.md
+
+# IDE and operating system
+.idea/
+.DS_Store
+Thumbs.db
+Desktop.ini
