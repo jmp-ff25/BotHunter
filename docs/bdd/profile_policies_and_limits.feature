@@ -53,27 +53,23 @@ Feature: Resume, search preferences, policies and limits
     Given the owner has not enabled full automation
     When the owner views the automation policy
     Then full automation is shown as disabled
-    And automatic external actions are not permitted
+    And automatic vacancy applications are not permitted
 
   Scenario: Enable full automation with complete configuration
     Given the owner has registered a resume
     And the owner has configured search preferences
-    And the owner has configured allowed automatic action types
-    And the owner has configured daily action limits
+    And the owner has configured a daily application limit
     And the owner has configured application preparation rules
-    And the owner has configured employer message response rules
     And the owner has configured situations that require owner intervention
     When the owner explicitly enables full automation
     Then full automation is shown as enabled
-    And the owner can see which automatic actions are permitted
+    And automatic vacancy applications are permitted
 
   Scenario: Cannot enable full automation without a registered resume
     Given no owner resume has been registered
     And the owner has configured search preferences
-    And the owner has configured allowed automatic action types
-    And the owner has configured daily action limits
+    And the owner has configured a daily application limit
     And the owner has configured application preparation rules
-    And the owner has configured employer message response rules
     And the owner has configured situations that require owner intervention
     When the owner attempts to enable full automation
     Then full automation remains disabled
@@ -82,10 +78,8 @@ Feature: Resume, search preferences, policies and limits
   Scenario: Cannot enable full automation without search preferences
     Given the owner has registered a resume
     And search preferences have not been configured
-    And the owner has configured allowed automatic action types
-    And the owner has configured daily action limits
+    And the owner has configured a daily application limit
     And the owner has configured application preparation rules
-    And the owner has configured employer message response rules
     And the owner has configured situations that require owner intervention
     When the owner attempts to enable full automation
     Then full automation remains disabled
@@ -95,39 +89,16 @@ Feature: Resume, search preferences, policies and limits
     Given full automation is enabled
     When the owner disables full automation
     Then full automation is shown as disabled
-    And automatic external actions are not permitted
+    And automatic vacancy applications are not permitted
 
-  # --- Allowed automatic action types ---
-
-  Scenario: Configure allowed automatic action types
-    When the owner allows automatic vacancy applications
-    And the owner disallows automatic employer messages
-    And the owner saves the automation policy
-    Then the owner can see that vacancy applications are permitted
-    And the owner can see that employer messages are not permitted
-
-  Scenario: Change allowed automatic action types
-    Given automatic vacancy applications are permitted
-    And automatic employer messages are not permitted
-    When the owner disallows automatic vacancy applications
-    And the owner allows automatic employer messages
-    And the owner saves the automation policy
-    Then the owner can see that vacancy applications are not permitted
-    And the owner can see that employer messages are permitted
-
-  # --- Action limits ---
+  # --- Application limits ---
 
   Scenario: Configure daily application limit
     When the owner sets a daily limit of 10 vacancy applications
     And the owner saves the automation policy
     Then the owner can see a daily application limit of 10
 
-  Scenario: Configure daily outgoing message limit
-    When the owner sets a daily limit of 5 outgoing employer messages
-    And the owner saves the automation policy
-    Then the owner can see a daily outgoing message limit of 5
-
-  Scenario: Update daily action limits
+  Scenario: Update daily application limit
     Given the owner has configured a daily application limit of 10
     When the owner changes the daily application limit to 3
     And the owner saves the automation policy
@@ -140,15 +111,34 @@ Feature: Resume, search preferences, policies and limits
     And the owner saves the automation policy
     Then the owner can review the active application preparation rules
 
-  Scenario: Configure employer message response rules
-    When the owner defines rules for responding to employer messages
-    And the owner saves the automation policy
-    Then the owner can review the active employer message response rules
-
   Scenario: Configure situations that require owner intervention
-    When the owner defines that unclear employer requests require owner intervention
+    When the owner defines that unclear application situations require owner intervention
     And the owner saves the automation policy
-    Then the owner can see that unclear employer requests require owner intervention
+    Then the owner can see that unclear application situations require owner intervention
+
+  Scenario: Employer communication remains manual
+    When the owner reviews the automation policy
+    Then the owner can see that employer communication is not automated
+    And the owner can see that only the owner may communicate with employers
+
+  # --- Application statistics notifications ---
+
+  Scenario: Receive daily application count notification
+    Given the owner has enabled application statistics notifications
+    And BotHunter has submitted vacancy applications today
+    When the daily application statistics notification is sent
+    Then the owner receives the number of applications submitted today
+
+  Scenario: Receive notification when rejections are present
+    Given the owner has enabled application statistics notifications
+    And BotHunter has recorded application rejections
+    When the application statistics notification is sent
+    Then the owner is informed that rejections are present
+
+  Scenario: View total application count for the recent month
+    Given BotHunter has recorded application history for the recent month
+    When the owner reviews application statistics
+    Then the owner can see the total number of applications for the recent month
 
   # --- Policy visibility and persistence ---
 
@@ -156,18 +146,16 @@ Feature: Resume, search preferences, policies and limits
     Given the owner has registered a resume
     And the owner has configured search preferences
     And the owner has enabled full automation
-    And the owner has configured allowed automatic action types
-    And the owner has configured daily action limits
+    And the owner has configured a daily application limit
     And the owner has configured application preparation rules
-    And the owner has configured employer message response rules
     And the owner has configured situations that require owner intervention
     When the owner reviews the automation policy summary
     Then the owner sees whether full automation is enabled
     And the owner sees the active resume registration
     And the owner sees the active search preferences
-    And the owner sees permitted automatic action types
-    And the owner sees configured daily action limits
+    And the owner sees the configured daily application limit
     And the owner sees key preparation and intervention rules
+    And the owner sees that employer communication is not automated
 
   Scenario: Saved resume, search preferences, and policies remain available after restart
     Given the owner has registered a resume

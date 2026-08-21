@@ -145,4 +145,4 @@
 
 - Настройка политик и лимитов → `profile_policies_and_limits.feature`
 - Применение лимитов при отклике → Application submission
-- Восстановление `unknown outcome` → Application submission / Employer messaging
+- Восстановление `unknown outcome` → Application submission
