@@ -22,12 +22,13 @@ workspace "BotHunter" "Architecture of the local-first job search automation sys
 
             worker = container "Automation Worker Process" "Runs schedules and automation workflows, integrates with external systems, and recovers incomplete work." "Python" {
                 triggerRecovery = component "Trigger and Recovery Coordinator" "Handles schedules, signals, recovery scans, command leases, and heartbeat." "Python component" "Application Component"
-                automationOrchestrator = component "Automation Orchestrator" "Coordinates vacancy search, analysis, applications, messages, and notifications." "Python component" "Application Component"
+                automationOrchestrator = component "Automation Orchestrator" "Coordinates vacancy search, analysis, applications, activity index maintenance, and notifications." "Python component" "Application Component"
+                activityIndexMaintenance = component "Activity Index Maintenance" "Periodically maintains HH activity index through read/click workflows without custom employer messages." "Python component" "Application Component"
                 externalActionExecutor = component "External Action Executor" "Executes every irreversible vacancy-platform action through a consistent snapshot, domain safety check, and conditional intent commit." "Python component" "Application Component"
                 safetyGuard = component "Safety and Policy Guard" "Enforces policies, limits, pause checkpoints, idempotency, and safe side effects." "Shared Python module" "Domain Component"
                 workerDomain = component "Domain Model" "Shared vacancy, matching, policy, and workflow concepts used by the Worker." "Shared Python module" "Domain Component"
                 vacancyQueryPort = component "Vacancy Query Port" "Application boundary for reading vacancies and observable source state." "Application contract" "Application Port"
-                externalActionPort = component "External Action Port" "Application boundary for allowed applications and outgoing messages." "Application contract" "Application Port"
+                externalActionPort = component "External Action Port" "Application boundary for allowed application submissions." "Application contract" "Application Port"
                 candidateContextPort = component "Candidate Context Port" "Application boundary for retrieving relevant candidate experience." "Application contract" "Application Port"
                 aiPort = component "AI Port" "Application boundary for analysis and content generation." "Application contract" "Application Port"
                 notificationPort = component "Notification Port" "Application boundary for owner notifications." "Application contract" "Application Port"
@@ -46,7 +47,7 @@ workspace "BotHunter" "Architecture of the local-first job search automation sys
         }
 
         owner -> bothunter "Configures, controls, and reviews job search automation"
-        bothunter -> hh "Searches vacancies, submits applications, and handles messages"
+        bothunter -> hh "Searches vacancies, submits applications, and maintains HH activity index"
         bothunter -> telegram "Sends notifications and intervention requests"
         bothunter -> aiProvider "Requests analysis and personalized content"
 
@@ -77,6 +78,12 @@ workspace "BotHunter" "Architecture of the local-first job search automation sys
 
         triggerRecovery -> operationalRepositoryPort "Claims commands, maintains leases, and records heartbeat"
         triggerRecovery -> automationOrchestrator "Starts or reconciles workflows"
+        triggerRecovery -> activityIndexMaintenance "Schedules activity index maintenance"
+        activityIndexMaintenance -> workerDomain "Applies activity index policies"
+        activityIndexMaintenance -> safetyGuard "Checks pause-state and limits"
+        activityIndexMaintenance -> hhAdapter "Runs HH activity index workflows"
+        activityIndexMaintenance -> operationalRepositoryPort "Records activity index runs and audit events"
+        automationOrchestrator -> activityIndexMaintenance "May delegate scheduled maintenance"
         automationOrchestrator -> workerDomain "Applies vacancy and workflow rules"
         automationOrchestrator -> vacancyQueryPort "Reads vacancies and observable source state"
         automationOrchestrator -> candidateContextPort "Requests relevant candidate context"

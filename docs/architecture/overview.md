@@ -152,15 +152,17 @@ Launcher не содержит бизнес-логики и не являетс�
 - **Trigger and Recovery Coordinator** — расписание, signals,
   recovery scan, command claim, lease и heartbeat.
 - **Automation Orchestrator** — последовательность поиска, анализа,
-  оценки, отклика, сообщений и уведомлений.
+  оценки, откликов, обслуживания индекса активности HH и уведомлений.
+- **Activity Index Maintenance** — периодическое обслуживание индекса
+  активности HH через HH Adapter без отправки собственных сообщений
+  работодателям (ADR-0006).
 - **External Action Executor** — единственная прикладная граница
-  выполнения необратимых откликов и исходящих сообщений
-  на площадках вакансий.
+  выполнения необратимых откликов на площадках вакансий (ADR-0007).
 - **Safety and Policy Guard** — политики, лимиты, pause checkpoints,
   idempotency и защита от повторных side effects.
 - **Vacancy Query Port** — чтение вакансий и наблюдаемого состояния
   без привязки к площадке.
-- **External Action Port** — отправка разрешённых откликов и сообщений.
+- **External Action Port** — отправка разрешённых откликов.
 - **HH Adapter** — реализация query/action ports и Playwright workflows.
 - **Candidate Context Port** — получение релевантного опыта кандидата
   без зависимости Application от retrieval-технологии.
@@ -229,8 +231,9 @@ Worker периодически записывает heartbeat. Устаревш
 ### Единая граница side effects
 
 Automation Orchestrator не вызывает External Action Port напрямую.
-Все необратимые отклики и исходящие сообщения на площадках вакансий
-проходят через External Action Executor.
+Все необратимые отклики на площадках вакансий проходят через
+External Action Executor. Автоматическая переписка с работодателями
+не выполняется (ADR-0007).
 
 Executor выполняет обязательную последовательность:
 
@@ -258,7 +261,7 @@ Pause, полученная после commit intent, применяется п�
 
 - command idempotency предотвращает повторное исполнение одной команды;
 - business-action deduplication предотвращает повторный отклик
-  или сообщение для одного внешнего объекта.
+  для одного внешнего объекта.
 
 ### Intent и результат
 
@@ -311,8 +314,8 @@ Pause не отменяет уже отправленное действие. Г
 HH является первым adapter, но не частью core.
 
 Контракт источника охватывает возможности площадки, необходимые
-Application: поиск и чтение вакансий, наблюдение состояния, отправку
-откликов и работу с сообщениями.
+Application: поиск и чтение вакансий, наблюдение состояния и отправку
+откликов (если площадка поддерживает).
 
 Различия площадок выражаются capabilities adapter-а. Application
 не должно предполагать, что каждый источник поддерживает одинаковый
@@ -341,7 +344,7 @@ development-support tool, который собирает технические
 
 До проектирования конкретной функциональности не фиксируются:
 
-- Python package tree, классы и сигнатуры ports;
+- точные сигнатуры ports (package tree — см. `docs/design/bothunter-core.md`);
 - web-framework и способ построения UI;
 - HTTP routes и signal payloads;
 - SQLite schema, индексы и параметры подключения;
@@ -360,3 +363,5 @@ development-support tool, который собирает технические
 - [ADR-0003: локальное хранение данных](../decisions/0003-local-data-storage.md)
 - [ADR-0004: гибридная координация Worker](../decisions/0004-hybrid-worker-coordination.md)
 - [ADR-0005: безопасное выполнение внешних действий](../decisions/0005-safe-external-action-execution.md)
+- [ADR-0006: модуль обслуживания индекса активности HH](../decisions/0006-hh-activity-index-module.md)
+- [ADR-0007: без автоматической переписки с работодателями](../decisions/0007-no-automated-employer-messaging.md)
