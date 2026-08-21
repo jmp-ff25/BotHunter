@@ -11,13 +11,25 @@ docs/development-process.md
 2. соответствующий файл из docs/tasks/, если задача
    относится к конкретной функциональности.
 
-Также учитывай применимые Rules, Skills и Agents из .cursor/.
+Также учитывай применимые Rules, Skills и Agents из `.cursor/`.
+
+**Skills:**
+- Установленные: `.agents/skills/` + `skills-lock.json` (через `npx skills`)
+- Проектные: `.cursor/skills/` (workflow, BDD, recorder)
+- Каталог: `.cursor/skills/README.md`
+
+**Agents:**
+- `architecture-consultant` — архитектура, readonly
+- `implementation-agent` — реализация Python-кода (TDD, pytest, design docs)
+
+При работе с `**/*.py` применяй rule `python-implementation.mdc`.
 
 ## Карта документации
 
 - docs/development-process.md — процесс разработки;
 - docs/project-vision.md — цели и границы проекта;
 - docs/architecture/ — архитектура и C4 / Structurizr;
+- docs/design/ — проектирование реализации (этап 5);
 - docs/bdd/ — BDD-сценарии;
 - docs/decisions/ — ADR;
 - docs/tasks/ — спецификации отдельных функциональных задач.

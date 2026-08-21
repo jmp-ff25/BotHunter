@@ -1,0 +1,51 @@
+---
+description: Обязательные skills и проверки при реализации Python-кода BotHunter
+globs: "**/*.py"
+alwaysApply: false
+---
+
+# Python Implementation
+
+Перед написанием или существенным изменением Python-кода прочитай
+применимые skills из `.agents/skills/`:
+
+| Задача | Skill |
+|--------|-------|
+| Любая реализация / bugfix | `test-driven-development` |
+| Тесты, fixtures, mocks | `python-testing-patterns` |
+| Type hints, typing | `python-type-safety` |
+| Структура пакетов, модули | `python-project-structure` |
+| Исключения, границы ошибок | `python-error-handling` |
+| Завершение работы | `verification-before-completion` |
+
+Проектные skills в `.cursor/skills/`:
+
+- `bothunter-workflow` — этап процесса, stop-and-wait;
+- `bothunter-bdd` — pytest-bdd и feature-файлы;
+- `bothunter-recorder` — `tools/recorder`.
+
+Также соблюдай Rules: `code-quality.mdc`, `testing.mdc`, `security.mdc`.
+Для Playwright и HH — `playwright.mdc`.
+
+## Порядок работы
+
+1. Определи фазу в `docs/design/implementation-plan.md`.
+2. Прочитай BDD / design / task spec, если применимо.
+3. TDD: failing test → minimal code → refactor.
+4. После изменений:
+
+```bash
+pytest -q
+ruff check .
+```
+
+5. Не заявляй о готовности без вывода команд (skill `verification-before-completion`).
+
+## Границы архитектуры
+
+- `src/bothunter/domain/` — без Playwright, SQLite, HTTP, Telegram, AI SDK.
+- `tools/recorder/` — вне runtime BotHunter.
+- Новый источник вакансий — через ports, без изменения Domain/Application.
+
+Для делегирования реализации используй агента `implementation-agent`
+(`.cursor/agents/implementation-agent.md`).
