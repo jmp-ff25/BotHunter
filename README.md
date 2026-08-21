@@ -7,7 +7,26 @@
 
 Документация: [`docs/project-vision.md`](docs/project-vision.md) ·
 [`docs/development-process.md`](docs/development-process.md) ·
-[`docs/bdd/`](docs/bdd/)
+[`docs/bdd/`](docs/bdd/) · [`docs/design/`](docs/design/)
+
+## Разработка
+
+Требуется Python 3.12.
+
+```bash
+python -m venv .venv
+.venv\Scripts\pip install -e ".[dev]"
+playwright install chromium
+pytest
+```
+
+## Browser Recorder
+
+```bash
+python -m tools.recorder record --output-dir ./recordings/hh --start-url "https://hh.ru/"
+```
+
+Подробнее: [`tools/recorder/README.md`](tools/recorder/README.md).
 
 ## Правовое примечание
 
